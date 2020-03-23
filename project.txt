@@ -105,6 +105,3 @@ model.add(Dense(classes_num, activation='softmax'))
 model.compile(loss='categorical_crossentropy',
               optimizer=optimizers.RMSprop(lr=lr),
               metrics=['accuracy'])
-model.add(Convolution2D(nb_filters2, conv2_size, conv2_size, border_mode ="same"))
-model.add(Activation("relu"))
-model.add(MaxPooling2D(pool_size=(pool_size, pool_size), dim_ordering='th'))
