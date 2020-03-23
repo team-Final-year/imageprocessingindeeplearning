@@ -1,0 +1,86 @@
+# STEP 1
+
+# #This section is base copy from google's sample import of tensorflow, keras, ploting and support libraries
+
+#keras install libraries
+!pip install -q keras
+!pip install -q tqdm
+
+#openCV is used to process and filter images
+!apt-get -qq install -y libsm6 libxext6 && pip install -q -U opencv-python
+
+
+# STEP 2
+# In this step we import the libraries needed to import files from google drive
+
+# Install a Drive FUSE wrapper.
+# https://github.com/astrada/google-drive-ocamlfuse
+!apt-get install -y -qq software-properties-common python-software-properties module-init-tools
+!add-apt-repository -y ppa:alessandro-strada/ppa 2>&1 > /dev/null
+!apt-get update -qq 2>&1 > /dev/null
+!apt-get -y install -qq google-drive-ocamlfuse fuse
+
+
+# STEP 3
+# Generate auth tokens for Colab
+
+# CLICK THE LINK GENERATED THEN COPY AND PASTE THE KEY INTO THE FIELD AND CLICK ENTER
+from google.colab import auth
+auth.authenticate_user()
+
+
+# STEP 4
+# Here we connect to your google drive folder.
+# You can download sample puppy and rabbit images using this link: https://drive.google.com/drive/folders/1RcWFv-PDtGK4n1JgkAgL77fB-N0I4oMP?usp=sharing
+
+# WARNING YOU MAY NEED TO RUN THIS CELL MULTIPLE TIMES TO GET A CONNECTION + KEY ESTABLISHED to your google drive.
+
+# CLICK THE 1st LINK GENERATED THEN COPY AND PASTE THE KEY INTO THE FIELD AND CLICK ENTER
+
+# RE-RUN THIS CELL AND CLICK THE 2nd LINK GENERATED THEN COPY AND PASTE THE KEY INTO THE FIELD AND CLICK ENTER
+
+# Generate creds for the Drive FUSE library.
+from oauth2client.client import GoogleCredentials
+creds = GoogleCredentials.get_application_default()
+import getpass
+!google-drive-ocamlfuse -headless -id={creds.client_id} -secret={creds.client_secret} < /dev/null 2>&1 | grep URL
+!echo {vcode} | google-drive-ocamlfuse -headless -id={creds.client_id} -secret={creds.client_secret}
+vcode = getpass.getpass()
+
+
+
+# STEP 5
+# Create a directory and mount Google Drive using that directory.
+!mkdir -p drive
+!google-drive-ocamlfuse drive
+# print 'Files in Drive:'
+!ls drive/
+
+
+
+import sys
+import os
+from keras.preprocessing.image import ImageDataGenerator
+from keras import optimizers
+from keras.models import Sequential
+from keras.layers import Dropout, Flatten, Dense, Activation
+from keras.layers.convolutional import Convolution2D, MaxPooling2D
+from keras import callbacks
+epochs = 20
+train_data_path = 'drive/Classification/train/'
+validation_data_path = 'drive/Classification/test/'
+
+"""
+Parameters
+"""
+img_width, img_height = 64, 64
+batch_size = 32
+samples_per_epoch = 4000
+validation_steps = 400
+nb_filters1 = 32
+nb_filters2 = 64
+conv1_size = 3
+conv2_size = 2
+pool_size = 2
+classes_num = 3
+lr = 0.001
