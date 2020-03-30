@@ -120,3 +120,21 @@ train_generator = train_datagen.flow_from_directory(
     target_size=(img_height, img_width),
     batch_size=batch_size,
     class_mode='categorical')
+
+validation_generator = test_datagen.flow_from_directory(
+    validation_data_path,
+    target_size=(img_height, img_width),
+    batch_size=batch_size,
+    class_mode='categorical')
+
+ 
+
+model.fit_generator(
+    train_generator,
+    samples_per_epoch=samples_per_epoch,
+    epochs=epochs,
+    validation_data=validation_generator,
+  
+    validation_steps=validation_steps)
+
+
